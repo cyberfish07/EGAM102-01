@@ -17,6 +17,7 @@ public class Enemy : MonoBehaviour
 
     // Set an event
     public event Action OnDeath;
+
     void Start()
     {
         EnemyRigidbody = GetComponent<Rigidbody2D>();
@@ -47,37 +48,30 @@ public class Enemy : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.GetComponent<Bullet>() != null)
+        if (collision.gameObject.GetComponent<Bullet>() != null || collision.gameObject.CompareTag("Player"))
         {
             // Create particle effect
             // Get the crush point
-            ContactPoint2D hit = collision.GetContact(0);
-            // 四元数旋转 = 四元数.欧拉角(0, 0, 数学函数库.反正切函数用于计算二维向量的角度)
-            Quaternion rotation = Quaternion.Euler
-            (
-                0, 0, Mathf.Atan2(hit.normal.y, hit.normal.x) * Mathf.Rad2Deg
-            );
-            Transform sparks = Instantiate
-            (
-                hitParticle.transform,
-                hit.point,
-                rotation
-            );
-            // Destroy particle
-            Destroy(sparks.gameObject, 0.2f);
-            HandleDeath(); // Enemy deate event start
-        }
-    }
-    private void HandleDeath()
-    {
-        // Invoke OnDeath event, tell wave manager
-        ScoreManager.Instance.AddScore(scoreValue);
+            if (hitParticle != null)
+            {
+                ContactPoint2D hit = collision.GetContact(0);
+                // 四元数旋转 = 四元数.欧拉角(0, 0, 数学函数库.反正切函数用于计算二维向量的角度)
+                Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan2(hit.normal.y, hit.normal.x) * Mathf.Rad2Deg);
+                Transform sparks = Instantiate(hitParticle.transform, hit.point, rotation);
+                Destroy(sparks.gameObject, 0.2f);
+            }
 
-        if (OnDeath != null)
-        {
-            OnDeath.Invoke();
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                Destroy(collision.gameObject);
+            }
+
+            if (OnDeath != null)
+            {
+                OnDeath.Invoke();
+            }
+            Destroy(gameObject);
         }
-        Destroy(gameObject);
     }
     // Scene transfer
     public void OnDestroy()

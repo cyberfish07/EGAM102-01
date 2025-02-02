@@ -32,12 +32,13 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        //Print the name of the game object I hit
-        Debug.Log(collision.gameObject);
-        //Destroy the bullet if it crush with enemy
-        if (collision.gameObject.GetComponent<Enemy>() != null)
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            Destroy(this.gameObject);
+            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }
