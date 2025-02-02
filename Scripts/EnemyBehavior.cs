@@ -82,13 +82,20 @@ public class Enemy : MonoBehaviour
     {
         // Prevent load scene twice
         if (hasGameOverTriggered) return;
-
         // Check if all enemy destroy
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy"); // Tag the enemy object
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
         if (enemies.Length <= 0)
         {
             hasGameOverTriggered = true;
-            UnityEngine.SceneManagement.SceneManager.LoadScene("End");
+            // Load Win or Lose
+            if (ScoreManager.Instance.CurrentScore >= 50)
+            {
+                SceneManager.LoadScene("Win");
+            }
+            else
+            {
+                SceneManager.LoadScene("Lose");
+            }
         }
     }
 }
