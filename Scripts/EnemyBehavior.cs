@@ -17,6 +17,8 @@ public class Enemy : MonoBehaviour
 
     // Set an event
     public event Action OnDeath;
+    public AudioSource audioSource;
+    public AudioClip destroySound;
 
     void Start()
     {
@@ -61,9 +63,27 @@ public class Enemy : MonoBehaviour
                 Destroy(sparks.gameObject, 0.2f);
             }
 
+            // Temp audio solution
+            if (audioSource != null && destroySound != null)
+            {
+                GameObject audioPlayer = new GameObject("TempAudio");
+                AudioSource tempAudio = audioPlayer.AddComponent<AudioSource>();
+                tempAudio.clip = destroySound;
+                tempAudio.Play();
+                Destroy(audioPlayer, destroySound.length);
+            }
+
+            // Add score
+            if (collision.gameObject.GetComponent<Bullet>() != null)
+            {
+                ScoreManager.Instance.AddScore(scoreValue);
+            }
+
             if (collision.gameObject.CompareTag("Player"))
             {
                 Destroy(collision.gameObject);
+                SceneManager.LoadScene("Lose");
+                return;
             }
 
             if (OnDeath != null)
